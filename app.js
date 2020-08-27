@@ -4,6 +4,8 @@ const express = require('express'),
     jwt = require('jsonwebtoken'),
     multer = require("multer")
 
+var cors = require('cors')
+
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize("node", "root", "Koval1979", {
     dialect: "mysql",
@@ -55,6 +57,7 @@ const port = 7000
 const tokenKey = 'sdfdsfsdfdsf'
 
 app.use(bodyParser.json())
+app.use(cors())
 
 const getKeyUser = async (keyheders) => {
     var UserReturn = null
@@ -72,6 +75,12 @@ const getKeyUser = async (keyheders) => {
     return UserReturn
 }
 app.use(async (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    req.header("Access-Control-Allow-Origin", "*");
+    req.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     req.user = await getKeyUser(req.headers.keyheders)
     next()
 })
@@ -183,6 +192,10 @@ app.get("/file/download/:id", async (req, res, next) => {
             res.download(SettingFile.path, SettingFile.originalname);
         } else res.send("no file");
     } else res.send("error no  user");
+});
+
+app.get("/test", async (req, res, next) => {
+    res.end("OK ");
 });
 
 app.listen(port, host, () => console.log(`Server listens http://${host}:${port}`))
